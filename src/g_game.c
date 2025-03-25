@@ -67,6 +67,7 @@
 #include "st_stuff.h"
 #include "v_video.h"
 #include "wi_stuff.h"
+#include "c_cmds.h"
 
 static void G_DoReborn(void);
 
@@ -1297,6 +1298,10 @@ bool    secretexit;
 
 void G_ExitLevel(void)
 {
+    C_ClearConsole();
+    C_PlayerStats_Game();
+    condump_func2("", "Player Stats");
+
     secretexit = false;
     gameaction = ga_completed;
 }

@@ -368,7 +368,7 @@ static void bindlist_func2(char *cmd, char *parms);
 static void clear_func2(char *cmd, char *parms);
 static void cmdlist_func2(char *cmd, char *parms);
 static bool condump_func1(char *cmd, char *parms);
-static void condump_func2(char *cmd, char *parms);
+//static void condump_func2(char *cmd, char *parms);
 static void cvarlist_func2(char *cmd, char *parms);
 static void endgame_func2(char *cmd, char *parms);
 static void exitmap_func2(char *cmd, char *parms);
@@ -2309,7 +2309,7 @@ static bool condump_func1(char *cmd, char *parms)
     return (numconsolestrings > CONSOLEBLANKLINES);
 }
 
-static void condump_func2(char *cmd, char *parms)
+void condump_func2(char *cmd, char *parms)
 {
     char        consolefolder[MAX_PATH];
     char        filename[MAX_PATH];
@@ -6390,7 +6390,7 @@ static void ShowMonsterKillStat_Game(const int tabs[MAXTABS], const mobjtype_t t
     }
 }
 
-static void C_PlayerStats_Game(void)
+void C_PlayerStats_Game(void)
 {
     const int       tabs[MAXTABS] = { 230, 365 };
     skill_t         favoriteskilllevel1 = favoriteskilllevel();
