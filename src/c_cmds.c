@@ -664,7 +664,7 @@ consolecmd_t consolecmds[] =
         "Clears the console."),
     CCMD(cmdlist, "", ccmdlist, null_func1, cmdlist_func2, true, "[" BOLDITALICS("searchstring") "]",
         "Lists all console commands."),
-    CCMD(condump, "", "", condump_func1, condump_func2, true, "[" BOLDITALICS("filename") "[" BOLD(".txt") "]]",
+    CCMD(condump, "", "", condump_func1, condump_func2, true, "[" BOLDITALICS("filename") "[" BOLD(".csv") "]]",
         "Dumps the contents of the console to a file."),
     CVAR_INT(crosshair, "", "", crosshair_func1, crosshair_func2, CF_NONE, CROSSHAIRVALUEALIAS,
         "Toggles your crosshair (" BOLD("none") ", " BOLD("cross") " or " BOLD("dot") ")."),
@@ -2293,13 +2293,13 @@ static void cmdlist_func2(char *cmd, char *parms)
 static int indentation(const char *string)
 {
     const int   len = (int)strlen(string);
-    int         count = 0;
+    int         count = 1;
 
-    for (int i = 0; i < len; i++)
+   /* for (int i = 0; i < len; i++)
         if (string[i] == ' ')
             count++;
         else
-            break;
+            break;*/
 
     return count;
 }
@@ -2308,8 +2308,121 @@ static bool condump_func1(char *cmd, char *parms)
 {
     return (numconsolestrings > CONSOLEBLANKLINES);
 }
+//
+//void condump_func2(char *cmd, char *parms)
+//{
+//    char        consolefolder[MAX_PATH];
+//    char        filename[MAX_PATH];
+//    const char  *appdatafolder = M_GetAppDataFolder();
+//    FILE        *file;
+//
+//    M_snprintf(consolefolder, sizeof(consolefolder), "%s" DIR_SEPARATOR_S DOOMRETRO_CONSOLEFOLDER, appdatafolder);
+//    M_MakeDirectory(consolefolder);
+//
+//    if (!*parms)
+//    {
+//        int count = 0;
+//
+//        M_snprintf(filename, sizeof(filename), "%s" DIR_SEPARATOR_S "%s.txt", consolefolder, cmd);
+//
+//        while (M_FileExists(filename))
+//        {
+//            char    *temp = commify(++count);
+//
+//            M_snprintf(filename, sizeof(filename), "%s" DIR_SEPARATOR_S "%s (%s).txt", consolefolder, cmd, temp);
+//            free(temp);
+//        }
+//    }
+//    else
+//        M_snprintf(filename, sizeof(filename), "%s" DIR_SEPARATOR_S "%s%s",
+//            consolefolder, parms, (strchr(parms, '.') ? "" : ".txt"));
+//
+//    if ((file = fopen(filename, "wt")))
+//    {
+//        char    *temp = commify((int64_t)numconsolestrings - CONSOLEBLANKLINES - 1);
+//
+//        for (int i = 1; i < numconsolestrings - 1; i++)
+//        {
+//            stringtype_t    type = console[i].stringtype;
+//
+//            if (type == dividerstring)
+//                fprintf(file, "%s\n", DIVIDERSTRING);
+//            else
+//            {
+//                char            *string = M_StringDuplicate(console[i].string);
+//                const int       len = (int)strlen(string);
+//                unsigned int    outpos = 0;
+//                int             tabcount = 0;
+//
+//                if (!len)
+//                    continue;
+//
+//                if (type == warningstring || type == playerwarningstring)
+//                    fputs("! ", file);
+//
+//                for (int inpos = (indentation(string) - 1) / 2; inpos < len; inpos++)
+//                {
+//                    const unsigned char letter = string[inpos];
+//
+//                    if (letter == '\t')
+//                    {
+//                        const unsigned int  tabstop = console[i].tabs[tabcount] / 6;
+//
+//                        if (outpos < tabstop)
+//                        {
+//                            for (unsigned int spaces = 0; spaces < tabstop - outpos; spaces++)
+//                                fputc(' ', file);
+//
+//                            outpos = tabstop;
+//                            tabcount++;
+//                        }
+//                        else
+//                        {
+//                            fputc(' ', file);
+//                            outpos++;
+//                        }
+//                    }
+//                    else if (letter != '\n'
+//                        && letter != BOLDONCHAR && letter != BOLDOFFCHAR
+//                        && letter != ITALICSONCHAR && letter != ITALICSOFFCHAR
+//                        && letter != MONOSPACEDONCHAR && letter != MONOSPACEDOFFCHAR)
+//                    {
+//                        fputc(letter, file);
+//                        outpos++;
+//                    }
+//                }
+//
+//                if (type == playermessagestring || type == playerwarningstring)
+//                {
+//                    char    buffer[9];
+//
+//                    for (unsigned int spaces = (type == playermessagestring ? 0 : 2); spaces < 92 - outpos; spaces++)
+//                        fputc(' ', file);
+//
+//                    M_StringCopy(buffer, C_CreateTimeStamp(i), sizeof(buffer));
+//
+//                    if (strlen(buffer) == 7)
+//                        fputc(' ', file);
+//
+//                    fputs(buffer, file);
+//                }
+//
+//                fputc('\n', file);
+//                free(string);
+//            }
+//        }
+//
+//        fclose(file);
+//
+//        C_Output("%s lines from the console were dumped into " BOLD("%s") ".", temp, filename);
+//        free(temp);
+//    }
+//    else
+//        C_Warning(0, BOLD("%s") " couldn't be created.", filename);
+//}
 
-void condump_func2(char *cmd, char *parms)
+
+void condump_func2(char *cmd, char *parms, char *extension)
 {
     char        consolefolder[MAX_PATH];
     char        filename[MAX_PATH];
@@ -2323,19 +2436,19 @@ void condump_func2(char *cmd, char *parms)
     {
         int count = 0;
 
-        M_snprintf(filename, sizeof(filename), "%s" DIR_SEPARATOR_S "%s.txt", consolefolder, cmd);
+        M_snprintf(filename, sizeof(filename), "%s" DIR_SEPARATOR_S "%s (%s)%s", consolefolder, cmd, extension);
 
         while (M_FileExists(filename))
         {
             char    *temp = commify(++count);
-
-            M_snprintf(filename, sizeof(filename), "%s" DIR_SEPARATOR_S "%s (%s).txt", consolefolder, cmd, temp);
+            M_snprintf(filename, sizeof(filename), "%s" DIR_SEPARATOR_S "%s (%s)%s", consolefolder, cmd, temp, extension);
+  
             free(temp);
         }
     }
     else
         M_snprintf(filename, sizeof(filename), "%s" DIR_SEPARATOR_S "%s%s",
-            consolefolder, parms, (strchr(parms, '.') ? "" : ".txt"));
+            consolefolder, parms, (strchr(parms, '.') ? "" : extension));
 
     if ((file = fopen(filename, "wt")))
     {
@@ -2346,7 +2459,7 @@ void condump_func2(char *cmd, char *parms)
             stringtype_t    type = console[i].stringtype;
 
             if (type == dividerstring)
-                fprintf(file, "%s\n", DIVIDERSTRING);
+                continue; // Skip divider strings
             else
             {
                 char            *string = M_StringDuplicate(console[i].string);
@@ -2366,21 +2479,8 @@ void condump_func2(char *cmd, char *parms)
 
                     if (letter == '\t')
                     {
-                        const unsigned int  tabstop = console[i].tabs[tabcount] / 6;
-
-                        if (outpos < tabstop)
-                        {
-                            for (unsigned int spaces = 0; spaces < tabstop - outpos; spaces++)
-                                fputc(' ', file);
-
-                            outpos = tabstop;
-                            tabcount++;
-                        }
-                        else
-                        {
-                            fputc(' ', file);
-                            outpos++;
-                        }
+                        fputc(',', file);
+                        outpos++;
                     }
                     else if (letter != '\n'
                         && letter != BOLDONCHAR && letter != BOLDOFFCHAR
@@ -2420,6 +2520,9 @@ void condump_func2(char *cmd, char *parms)
     else
         C_Warning(0, BOLD("%s") " couldn't be created.", filename);
 }
+
+
+
 
 //
 // cvarlist CCMD
@@ -6414,26 +6517,26 @@ void C_PlayerStats_Game(void)
     C_Header(tabs, playerstats, PLAYERSTATSHEADER);
 
     if (viewplayer->cheats & (CF_ALLMAP | CF_ALLMAP_THINGS))
-        C_TabbedOutput(tabs, "Map explored\t100%%\t\x96");
+        C_TabbedOutput(tabs, "Map explored, \t100%%\t\x96");
     else
-        C_TabbedOutput(tabs, "Map explored\t%i%%\t\x96", nummappedlines * 100 / numvisiblelines);
+        C_TabbedOutput(tabs, "Map explored, \t%i%%\t\x96", nummappedlines * 100 / numvisiblelines);
 
     temp1 = commifystat(stat_mapsfinished);
     temp2 = commifystat(stat_mapsstarted);
-    C_TabbedOutput(tabs, "Maps finished\t\x96\t%s of %s (%i%%)",
+    C_TabbedOutput(tabs, "Maps finished, \t\x96\t%s of %s (%i%%)",
         temp1, temp2, stat_mapsfinished * 100 / stat_mapsstarted);
     free(temp1);
     free(temp2);
 
     temp1 = commify(viewplayer->gamessaved);
     temp2 = commifystat(stat_gamessaved);
-    C_TabbedOutput(tabs, "Games saved\t%s\t%s", temp1, temp2);
+    C_TabbedOutput(tabs, "Games saved, \t%s\t%s", temp1, temp2);
     free(temp1);
     free(temp2);
 
     temp1 = commify(viewplayer->gamesloaded);
     temp2 = commifystat(stat_gamesloaded);
-    C_TabbedOutput(tabs, "Games loaded\t%s\t%s", temp1, temp2);
+    C_TabbedOutput(tabs, "Games loaded, \t%s\t%s", temp1, temp2);
     free(temp1);
     free(temp2);
 
@@ -6471,7 +6574,7 @@ void C_PlayerStats_Game(void)
     temp1 = commify(killcount);
     temp2 = commify(totalkills);
     temp3 = commifystat(stat_monsterskilled_total);
-    C_TabbedOutput(tabs, "Monsters %s %s\t%s of %s (%i%%)\t%s",
+    C_TabbedOutput(tabs, "Monsters, %s %s\t%s of %s (%i%%)\t%s",
         (M_StringCompare(playername, playername_default) ? "you" : playername), s_KILLED,
         temp1, temp2, (totalkills ? killcount * 100 / totalkills : 0), temp3);
     free(temp1);
@@ -6733,13 +6836,13 @@ void C_PlayerStats_Game(void)
 
     temp1 = commify(viewplayer->damageinflicted);
     temp2 = commifystat(stat_damageinflicted);
-    C_TabbedOutput(tabs, "Damage inflicted\t%s\t%s", temp1, temp2);
+    C_TabbedOutput(tabs, ",Damage inflicted\t%s\t%s", temp1, temp2);
     free(temp1);
     free(temp2);
 
     temp1 = commify(viewplayer->damagereceived);
     temp2 = commifystat(stat_damagereceived);
-    C_TabbedOutput(tabs, "Damage received\t%s\t%s", temp1, temp2);
+    C_TabbedOutput(tabs, ",Damage received \t%s\t%s", temp1, temp2);
     free(temp1);
     free(temp2);
 
@@ -7096,7 +7199,7 @@ static void C_PlayerStats_NoGame(void)
     }
 
     temp1 = commifystat(stat_monsterskilled_total);
-    C_TabbedOutput(tabs, "Monsters %s %s\t\x96\t%s",
+    C_TabbedOutput(tabs, "Monsters, %s %s\t\x96\t%s",
         (M_StringCompare(playername, playername_default) ? "you" : playername), s_KILLED, temp1);
     free(temp1);
 
@@ -7273,11 +7376,11 @@ static void C_PlayerStats_NoGame(void)
     }
 
     temp1 = commifystat(stat_damageinflicted);
-    C_TabbedOutput(tabs, "Damage inflicted\t\x96\t%s", temp1);
+    C_TabbedOutput(tabs, ".Damage inflicted\t\x96\t%s", temp1);
     free(temp1);
 
     temp1 = commifystat(stat_damagereceived);
-    C_TabbedOutput(tabs, "Damage received\t\x96\t%s", temp1);
+    C_TabbedOutput(tabs, ",Damage received,\t\x96\t%s", temp1);
     free(temp1);
 
     temp1 = commifystat(stat_deaths);
@@ -7451,6 +7554,24 @@ static void playerstats_func2(char *cmd, char *parms)
         C_PlayerStats_Game();
     else
         C_PlayerStats_NoGame();
+    char buffer[CONSOLETEXTMAXLENGTH];
+
+    // Exemplo de como adicionar uma vírgula ao final de cada string
+    snprintf(buffer, sizeof(buffer), "Health: %d,", viewplayer->health);
+    C_Output(buffer);
+
+    snprintf(buffer, sizeof(buffer), "Armor: %d,", viewplayer->armor);
+    C_Output(buffer);
+
+    snprintf(buffer, sizeof(buffer), "Kills: %d,", viewplayer->killcount);
+    C_Output(buffer);
+
+    snprintf(buffer, sizeof(buffer), "Items: %d,", viewplayer->itemcount);
+    C_Output(buffer);
+
+    snprintf(buffer, sizeof(buffer), "Secrets: %d,", viewplayer->secretcount);
+    C_Output(buffer);
+
 }
 
 //

@@ -1300,7 +1300,8 @@ void G_ExitLevel(void)
 {
     C_ClearConsole();
     C_PlayerStats_Game();
-    condump_func2("", "Player Stats");
+    condump_func2("", "Player Stats", ".txt");
+    condump_func2("", "Player Stats", ".csv");
 
     secretexit = false;
     gameaction = ga_completed;
