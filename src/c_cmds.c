@@ -6517,26 +6517,26 @@ void C_PlayerStats_Game(void)
     C_Header(tabs, playerstats, PLAYERSTATSHEADER);
 
     if (viewplayer->cheats & (CF_ALLMAP | CF_ALLMAP_THINGS))
-        C_TabbedOutput(tabs, "Map explored, \t100%%\t\x96");
+        C_TabbedOutput(tabs, "Map explored \t100%%\t\x96");
     else
-        C_TabbedOutput(tabs, "Map explored, \t%i%%\t\x96", nummappedlines * 100 / numvisiblelines);
+        C_TabbedOutput(tabs, "Map explored \t%i%%\t\x96", nummappedlines * 100 / numvisiblelines);
 
     temp1 = commifystat(stat_mapsfinished);
     temp2 = commifystat(stat_mapsstarted);
-    C_TabbedOutput(tabs, "Maps finished, \t\x96\t%s of %s (%i%%)",
+    C_TabbedOutput(tabs, "Maps finished \t\x96\t%s of %s (%i%%)",
         temp1, temp2, stat_mapsfinished * 100 / stat_mapsstarted);
     free(temp1);
     free(temp2);
 
     temp1 = commify(viewplayer->gamessaved);
     temp2 = commifystat(stat_gamessaved);
-    C_TabbedOutput(tabs, "Games saved, \t%s\t%s", temp1, temp2);
+    C_TabbedOutput(tabs, "Games saved \t%s\t%s", temp1, temp2);
     free(temp1);
     free(temp2);
 
     temp1 = commify(viewplayer->gamesloaded);
     temp2 = commifystat(stat_gamesloaded);
-    C_TabbedOutput(tabs, "Games loaded, \t%s\t%s", temp1, temp2);
+    C_TabbedOutput(tabs, "Games loaded \t%s\t%s", temp1, temp2);
     free(temp1);
     free(temp2);
 
@@ -6574,7 +6574,7 @@ void C_PlayerStats_Game(void)
     temp1 = commify(killcount);
     temp2 = commify(totalkills);
     temp3 = commifystat(stat_monsterskilled_total);
-    C_TabbedOutput(tabs, "Monsters, %s %s\t%s of %s (%i%%)\t%s",
+    C_TabbedOutput(tabs, "Monsters %s %s\t%s of %s (%i%%)\t%s",
         (M_StringCompare(playername, playername_default) ? "you" : playername), s_KILLED,
         temp1, temp2, (totalkills ? killcount * 100 / totalkills : 0), temp3);
     free(temp1);
@@ -7376,11 +7376,11 @@ static void C_PlayerStats_NoGame(void)
     }
 
     temp1 = commifystat(stat_damageinflicted);
-    C_TabbedOutput(tabs, ".Damage inflicted\t\x96\t%s", temp1);
+    C_TabbedOutput(tabs, "Damage inflicted\t\x96\t%s", temp1);
     free(temp1);
 
     temp1 = commifystat(stat_damagereceived);
-    C_TabbedOutput(tabs, ",Damage received,\t\x96\t%s", temp1);
+    C_TabbedOutput(tabs, "Damage received\t\x96\t%s", temp1);
     free(temp1);
 
     temp1 = commifystat(stat_deaths);
