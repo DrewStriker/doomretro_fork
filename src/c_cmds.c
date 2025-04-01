@@ -6517,7 +6517,7 @@ void C_PlayerStats_Game(void)
     C_Header(tabs, playerstats, PLAYERSTATSHEADER);
 
     if (viewplayer->cheats & (CF_ALLMAP | CF_ALLMAP_THINGS))
-        C_TabbedOutput(tabs, "Map explored \t100%%\t\x96");
+        C_TabbedOutput(tabs, "Map explored ");
     else
         C_TabbedOutput(tabs, "Map explored \t%i%%\t\x96", nummappedlines * 100 / numvisiblelines);
 
