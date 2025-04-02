@@ -31,7 +31,8 @@ def readCsvFile(path):
 
     return dataframes
 
-def criar_graficos(dataframes, graphType='linha', salvar=False):
+
+def CreateGraph(dataframes, graphType='linha', save=False):
     """
     Cria gráficos a partir dos DataFrames lidos dos arquivos CSV
     """
@@ -39,31 +40,47 @@ def criar_graficos(dataframes, graphType='linha', salvar=False):
         try:
             plt.figure(figsize=(10, 6))
             
-            collNum = df.select_dtypes(include=['number']).columns
+            numeric_cols = df.select_dtypes(include=['number']).columns
+            non_numeric_cols = df.select_dtypes(exclude=['number']).columns
             
-            if len(collNum) < 1:
+            if len(numeric_cols) < 1:
                 print(f"DataFrame '{name}' não possui colunas numéricas para plotar.")
                 continue
+                
+            if len(non_numeric_cols) > 0:
+                labels = df[non_numeric_cols[0]]
+                x_values = range(len(labels))
+            else:
+                x_values = range(len(df))
+                labels = None
             
             if graphType.lower() == 'linha':
-                for coll in collNum:
-                    plt.plot(df[coll], label=coll)
+                for col in numeric_cols:
+                    plt.plot(x_values, df[col], label=col)
                 plt.title(f"Gráfico de Linha - {name}")
+                if labels is not None:
+                    plt.xticks(x_values, labels, rotation=45, ha='right')
                 
             elif graphType.lower() == 'barra':
-                df[collNum].plot(kind='bar')
+                if labels is not None:
+                    x_pos = range(len(labels))
+                    for i, col in enumerate(numeric_cols):
+                        plt.bar([x + i*0.2 for x in x_pos], df[col], width=0.2, label=col)
+                    plt.xticks([x + 0.2*(len(numeric_cols)-1)/2 for x in x_pos], labels, rotation=45, ha='right')
+                else:
+                    df[numeric_cols].plot(kind='bar')
                 plt.title(f"Gráfico de Barras - {name}")
                 
-            elif graphType.lower() == 'histograma':
-                for coll in collNum:
-                    plt.hist(df[coll], alpha=0.5, label=coll)
-                plt.title(f"Histograma - {name}")
+            # elif graphType.lower() == 'histograma':
+            #     for col in numeric_cols:
+            #         plt.hist(df[col], alpha=0.5, label=col)
+            #     plt.title(f"Histograma - {name}")
                 
-            elif graphType.lower() == 'dispersao' and len(collNum) >= 2:
-                plt.scatter(df[collNum[0]], df[collNum[1]])
-                plt.xlabel(collNum[0])
-                plt.ylabel(collNum[1])
-                plt.title(f"Gráfico de Dispersão - {name}")
+            # elif graphType.lower() == 'dispersao' and len(numeric_cols) >= 2:
+            #     plt.scatter(df[numeric_cols[0]], df[numeric_cols[1]])
+            #     plt.xlabel(numeric_cols[0])
+            #     plt.ylabel(numeric_cols[1])
+            #     plt.title(f"Gráfico de Dispersão - {name}")
                 
             else:
                 print(f"Tipo de gráfico '{graphType}' não suportado ou dados insuficientes.")
@@ -72,7 +89,7 @@ def criar_graficos(dataframes, graphType='linha', salvar=False):
             plt.legend()
             plt.grid(True)
             
-            if salvar:
+            if save:
                 fileName = f"{name}_{graphType}.png"
                 plt.savefig(fileName, dpi=300, bbox_inches='tight')
                 print(f"Gráfico salvo como '{fileName}'")
@@ -81,6 +98,8 @@ def criar_graficos(dataframes, graphType='linha', salvar=False):
             
         except Exception as e:
             print(f"Erro ao criar gráfico para '{name}': {e}")
+
+
 
 def main():
     
@@ -98,24 +117,21 @@ def main():
     print("\nOpções de gráfico disponíveis:")
     print("1 - Gráfico de Linha")
     print("2 - Gráfico de Barras")
-    print("3 - Histograma")
-    print("4 - Gráfico de Dispersão")
+    # print("3 - Histograma")
+    # print("4 - Gráfico de Dispersão")
     
-    graphOption = input("Escolha o tipo de gráfico (1-4): ").strip()
+    graphOption = input("Escolha o tipo de gráfico: ").strip()
     
     types = {
         '1': 'linha',
         '2': 'barra',
-        '3': 'histograma',
-        '4': 'dispersao'
     }
     
     graphType = types.get(graphOption, 'linha')
     
     saveOption = input("Deseja salvar os gráficos? (s/n): ").strip().lower() == 's'
     
-    # Cria os gráficos
-    criar_graficos(dataframes, graphType, saveOption)
+    CreateGraph(dataframes, graphType, saveOption)
 
 if __name__ == "__main__":
     main()
