@@ -6574,7 +6574,7 @@ void C_PlayerStats_Game(void)
     temp1 = commify(killcount);
     temp2 = commify(totalkills);
     temp3 = commifystat(stat_monsterskilled_total);
-    C_TabbedOutput(tabs, "Monsters %s %s\t%s of %s (%i%%)\t%s",
+    C_TabbedOutput(tabs, "Monsters %s %s\t%s %s (%i%%)\t%s",
         (M_StringCompare(playername, playername_default) ? "you" : playername), s_KILLED,
         temp1, temp2, (totalkills ? killcount * 100 / totalkills : 0), temp3);
     free(temp1);
@@ -6836,13 +6836,13 @@ void C_PlayerStats_Game(void)
 
     temp1 = commify(viewplayer->damageinflicted);
     temp2 = commifystat(stat_damageinflicted);
-    C_TabbedOutput(tabs, ",Damage inflicted\t%s\t%s", temp1, temp2);
+    C_TabbedOutput(tabs, "Damage inflicted\t%s\t%s", temp1, temp2);
     free(temp1);
     free(temp2);
 
     temp1 = commify(viewplayer->damagereceived);
     temp2 = commifystat(stat_damagereceived);
-    C_TabbedOutput(tabs, ",Damage received \t%s\t%s", temp1, temp2);
+    C_TabbedOutput(tabs, "Damage received \t%s\t%s", temp1, temp2);
     free(temp1);
     free(temp2);
 
