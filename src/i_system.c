@@ -49,6 +49,8 @@
 #include "s_sound.h"
 #include "version.h"
 #include "w_wad.h"
+#include "c_cmds.h"
+#include "p_setup.h"
 
 #define PRODUCT_CORE    0x00000065
 
@@ -56,6 +58,8 @@
 typedef long    (__stdcall *PRTLGETVERSION)(PRTL_OSVERSIONINFOEXW);
 typedef BOOL    (WINAPI *PGETPRODUCTINFO)(DWORD, DWORD, DWORD, DWORD, PDWORD);
 typedef BOOL    (WINAPI *PISWOW64PROCESS)(HANDLE, PBOOL);
+
+extern int game_session_id;
 
 void I_PrintWindowsVersion(void)
 {
@@ -217,6 +221,15 @@ void I_PrintSystemInfo(void)
 //
 void I_Quit(bool shutdown)
 {
+
+    C_ClearConsole();
+    C_PlayerStats_Game();
+    char* datetime = GetCurrentDateTimeString();
+    char finalName[512];
+    snprintf(finalName, sizeof(finalName), "(ID %d) %s %s%s", game_session_id, datetime, maptitle, "(Uncomplete)");
+    condump_func2("", finalName);
+    free(datetime);
+
     if (shutdown)
     {
         D_FadeScreenToBlack();

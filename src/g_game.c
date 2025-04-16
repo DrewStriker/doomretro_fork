@@ -175,6 +175,8 @@ static char     savedescription[SAVESTRINGSIZE];
 
 gameaction_t    loadaction = ga_nothing;
 
+extern int game_session_id;
+
 void G_RemoveChoppers(void)
 {
     viewplayer->cheats &= ~CF_CHOPPERS;
@@ -1300,14 +1302,27 @@ void G_ExitLevel(void)
 {
     C_ClearConsole();
     C_PlayerStats_Game();
-    condump_func2("", "Player Stats");
+    char* datetime = GetCurrentDateTimeString();
+    char finalName[512];
+    snprintf(finalName, sizeof(finalName), "(ID %d) %s %s%s", game_session_id, datetime, maptitle, "(Complete)");
+    condump_func2("", finalName);
+    free(datetime);
 
     secretexit = false;
     gameaction = ga_completed;
+
 }
 
 void G_SecretExitLevel(void)
 {
+    C_ClearConsole();
+    C_PlayerStats_Game();
+    char* datetime = GetCurrentDateTimeString();
+    char finalName[512];
+    snprintf(finalName, sizeof(finalName), "(ID %d) %s %s%s", game_session_id, datetime, maptitle, "(Complete Secret)");
+    condump_func2("", finalName);
+    free(datetime);
+
     secretexit = true;
     gameaction = ga_completed;
 }

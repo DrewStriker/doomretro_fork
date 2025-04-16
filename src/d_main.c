@@ -177,6 +177,9 @@ static bool error;
 
 struct tm   gamestarttime;
 
+extern int game_session_id;
+int game_session_id = 0;
+
 //
 // D_PostEvent
 //
@@ -2840,6 +2843,9 @@ static void D_DoomMainSetup(void)
 //
 void D_DoomMain(void)
 {
+    srand((unsigned int)time(NULL));
+    game_session_id = rand() % 1000;
+
     D_DoomMainSetup();  // CPhipps - setup out of main execution stack
     D_DoomLoop();       // never returns
 }

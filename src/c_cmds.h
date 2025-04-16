@@ -151,3 +151,4 @@ bool C_ExecuteAlias(const char *alias);
 char *C_DistanceTraveled(uint64_t value, bool allowzero);
 void condump_func2(char* cmd, char* parms);
 void C_PlayerStats_Game(void);
+char* GetCurrentDateTimeString();
