@@ -1306,7 +1306,6 @@ void G_ExitLevel(void)
     char finalName[512];
     snprintf(finalName, sizeof(finalName), "(ID %d) %s %s%s", game_session_id, datetime, maptitle, "(Complete)");
     condump_func2("", finalName);
-    condump_func2("", "Player Stats", ".csv");
     free(datetime);
 
     secretexit = false;

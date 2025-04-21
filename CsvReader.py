@@ -104,7 +104,7 @@ def CreateGraph(dataframes, graphType='linha', save=False):
 def main():
     
     # pasta_csv = input("Digite o caminho da pasta com os arquivos CSV: ").strip()
-    path = "C:\Projects\doomretro_fork\msvc\Release\console".strip()
+    path = "C:/UnityProjectsSSD/GitHub/Doom Retro Fork/doomretro_fork/msvc/x64/Debug/console".strip()
     if not os.path.isdir(path):
         print("Pasta não encontrada!")
         return
