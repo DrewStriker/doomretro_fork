@@ -2,7 +2,7 @@ import os
 import re
 
 # Caminho da pasta onde estão os arquivos .txt
-caminho_da_pasta = "C:/UnityProjectsSSD/GitHub/Doom Retro Fork/doomretro_fork/msvc/x64/Debug/console"
+caminho_da_pasta = os.path.dirname(os.path.abspath(__file__)) + "/msvc/x64/Debug/console"
 
 # Expressão para detectar "x of 0 (z%)"
 padrao = re.compile(r"(\d+)\s+of\s+0\s+\(\d+%?\)")
