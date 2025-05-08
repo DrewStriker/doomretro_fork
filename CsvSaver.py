@@ -1,13 +1,11 @@
 import os
 import re
 
-# Caminho da pasta onde estão os arquivos .txt
 caminho_da_pasta = "C:/UnityProjectsSSD/GitHub/Doom Retro Fork/doomretro_fork/msvc/x64/Debug/console"
 
-# Expressão para detectar "x of 0 (z%)"
-padrao = re.compile(r"(\d+)\s+of\s+0\s+\(\d+%?\)")
+padrao_percentual = re.compile(r'\(\d+%?\)')
+padrao_x_of_y = re.compile(r'(\d+)\s+of\s+(\d+)')
 
-# Processa todos os arquivos .txt na pasta
 arquivos_txt = [f for f in os.listdir(caminho_da_pasta) if f.endswith(".txt")]
 
 if arquivos_txt:
@@ -17,59 +15,77 @@ if arquivos_txt:
         with open(caminho_completo, 'r', encoding='latin1') as arquivo:
             linhas = arquivo.readlines()
 
-        # Extrai nome da fase com status do nome do arquivo
-        nome_base = os.path.splitext(arquivo_txt)[0]  # remove extensão .txt
+        nome_base = os.path.splitext(arquivo_txt)[0]
 
         if 's ' in nome_base:
             fase_status = nome_base.split('s ', 1)[1]
         else:
-            fase_status = nome_base  # fallback
+            fase_status = nome_base
 
-        # Coleta os itens das colunas
         coluna_1 = []
         coluna_2 = []
+
+        linha_contador = 0  # para rastrear a posição da linha válida
 
         for linha in linhas:
             partes = linha.strip().split('  ')
             partes = [p for p in partes if p.strip()]
             if len(partes) >= 2:
-                coluna_1.append(partes[0])
-                coluna_2.append(partes[1])
+                header = partes[0].strip()
 
-        # Remove cabeçalho (se houver)
+                # Ignorar as linhas especificadas
+                if header in ["Maps finished", "Games saved", "Games loaded"]:
+                    continue
+
+                valor = partes[1].strip()
+
+                # Remove o símbolo % apenas da segunda linha válida
+                if linha_contador == 1:
+                    valor = valor.replace('%', '').strip()
+
+                # Remove a palavra "feet" da linha "Distance traveled"
+                if header == "Distance traveled":
+                    valor = valor.replace("feet", "").strip()
+
+                coluna_1.append(header)
+                coluna_2.append(valor)
+                linha_contador += 1
+
         if coluna_1 and coluna_2:
             coluna_1 = coluna_1[1:]
             coluna_2 = coluna_2[1:]
 
-        # Remove linhas onde a coluna 2 contém "x of 0 (z%)"
-        nova_coluna_1 = []
-        nova_coluna_2 = []
+        nova_linha_header = ["MAP"]
+        nova_linha_valor = [fase_status]
 
         for i in range(len(coluna_2)):
-            resultado = padrao.search(coluna_2[i])
-            if not resultado:
-                nova_coluna_1.append(coluna_1[i])
-                nova_coluna_2.append(coluna_2[i])
+            header = coluna_1[i]
+            valor = coluna_2[i]
 
-        coluna_1 = nova_coluna_1
-        coluna_2 = nova_coluna_2
+            match = padrao_x_of_y.search(valor)
 
-        # Adiciona títulos
-        coluna_1.insert(0, "MAP")
-        coluna_2.insert(0, fase_status)
+            if match:
+                x_valor = match.group(1)
+                y_valor = match.group(2)
 
-        # Formata os resultados
-        resultado_coluna_1 = '; '.join(coluna_1)
-        resultado_coluna_2 = '; '.join(coluna_2)
+                header_executado = header + " Executado"
+                nova_linha_header.append(header_executado)
+                nova_linha_valor.append(x_valor)
 
-        # Gera nome do arquivo de saída com base no nome do arquivo de entrada
+                header_total = header + " Total"
+                nova_linha_header.append(header_total)
+                nova_linha_valor.append(y_valor)
+            else:
+                valor_sem_percentual = padrao_percentual.sub('', valor).strip()
+                nova_linha_header.append(header)
+                nova_linha_valor.append(valor_sem_percentual)
+
         nome_arquivo_saida = os.path.splitext(arquivo_txt)[0] + ".csv"
         caminho_saida = os.path.join(caminho_da_pasta, nome_arquivo_saida)
 
-        # Salva no arquivo
         with open(caminho_saida, 'w', encoding='utf-8') as saida:
-            saida.write(resultado_coluna_1 + '\n')
-            saida.write(resultado_coluna_2 + '\n')
+            saida.write(', '.join(nova_linha_header) + '\n')
+            saida.write(', '.join(nova_linha_valor) + '\n')
 
         print(f"Processado: {arquivo_txt} → {nome_arquivo_saida}")
 
